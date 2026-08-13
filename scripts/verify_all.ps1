@@ -1,0 +1,133 @@
+# verify_all.ps1 - End-to-end verification of moon-weblink.
+#
+# Runs, in order:
+#   1.  moon fmt --check
+#   2.  moon check / build / test for each of the wasm-gc, js and native targets
+#   3.  CLI smoke tests (stats, parse, audit, relation, conversion round-trip)
+#   4.  every example program
+#   5.  scripts/count_code.py          (line budgets, named-test count)
+#   6.  scripts/verify_iana_snapshot.py (offline IANA snapshot integrity)
+#
+# Prints one PASS/FAIL line per step and exits non-zero if any step failed.
+#
+# Usage:
+#   powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1
+#   powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1 -MoonBin D:\Moonbit\bin\moon.exe
+
+param(
+    [string]$MoonBin = ""
+)
+
+$ErrorActionPreference = "Stop"
+$Root = Split-Path -Parent $PSScriptRoot
+Set-Location $Root
+
+if ($MoonBin -eq "") {
+    # Try PATH, then the common MoonBit install locations.
+    $candidate = Get-Command moon -ErrorAction SilentlyContinue
+    if ($candidate) {
+        $MoonBin = $candidate.Source
+    } elseif (Test-Path "$env:USERPROFILE\.moon\bin\moon.exe") {
+        $MoonBin = "$env:USERPROFILE\.moon\bin\moon.exe"
+    } elseif (Test-Path "D:\Moonbit\bin\moon.exe") {
+        $MoonBin = "D:\Moonbit\bin\moon.exe"
+    } else {
+        Write-Host "FAIL: could not locate the moon binary (pass -MoonBin)."
+        exit 1
+    }
+}
+Write-Host "moon: $MoonBin"
+
+$failures = @()
+$steps = 0
+
+function Step([string]$Name, [scriptblock]$Body) {
+    $script:steps++
+    try {
+        & $Body
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "PASS  $Name"
+        } else {
+            Write-Host "FAIL  $Name (exit $LASTEXITCODE)"
+            $script:failures += $Name
+        }
+    } catch {
+        Write-Host "FAIL  $Name ($_)"
+        $script:failures += $Name
+    }
+}
+
+Write-Host "--- formatting ---"
+Step "moon fmt --check" { & $MoonBin fmt --check }
+
+Write-Host "--- check / build / test across targets ---"
+foreach ($t in @("wasm-gc", "js", "native")) {
+    Step "moon check --target $t"   { & $MoonBin check --target $t }
+    Step "moon build --target $t"   { & $MoonBin build --target $t }
+    Step "moon test  --target $t"   { & $MoonBin test --target $t }
+}
+
+Write-Host "--- CLI smoke tests ---"
+Step "cli: stats" {
+    & $MoonBin run cmd/weblink-tool -- stats | Out-Host
+}
+Step "cli: parse a Link header" {
+    & $MoonBin run cmd/weblink-tool -- parse --input '<https://a.example/>; rel="next"' | Out-Host
+}
+Step "cli: canonicalize with mixed-case parameter names" {
+    & $MoonBin run cmd/weblink-tool -- canonicalize --input '<https://a.example/>; REL="canonical"' | Out-Host
+}
+Step "cli: validate a malformed value reports invalid" {
+    $out = & $MoonBin run cmd/weblink-tool -- validate --input 'not a link'
+    $out | Out-Host
+    if (-not ($out -match "valid: false")) { throw "expected 'valid: false'" }
+}
+Step "cli: audit flags the deprecated rev parameter" {
+    $out = & $MoonBin run cmd/weblink-tool -- audit --input '<https://a.example/>; rel="canonical"; rev="made"'
+    $out | Out-Host
+    if (-not ($out -match "deprecated-rev")) { throw "expected a deprecated-rev finding" }
+}
+Step "cli: relation registry lookup" {
+    & $MoonBin run cmd/weblink-tool -- relation next | Out-Host
+}
+Step "cli: to-linkset-json emits an RFC 9264 linkset" {
+    # Windows PowerShell 5.1 cannot pass embedded double quotes through a
+    # native-command argument (CommandLineToArgvW mangling), so JSON cannot
+    # travel via `moon run` argv. This step keeps argv quote-free; the
+    # header <-> JSON round-trip is exercised in-process by the linkset_json
+    # example below and by the test suite.
+    $out = & $MoonBin run cmd/weblink-tool -- to-linkset-json --input '<a>; rel=next'
+    $out | Out-Host
+    if (-not ($out -match '"linkset"')) { throw "expected a linkset JSON document" }
+    if (-not ($out -match '"next"')) { throw "expected the next relation member" }
+}
+
+Write-Host "--- examples ---"
+foreach ($ex in @("parse_header", "pagination", "linkset_json", "relation_query", "audit_header")) {
+    Step "example: $ex" { & $MoonBin run examples/$ex | Out-Host }
+}
+Step "example: linkset_json round-trips header -> JSON -> header" {
+    $out = & $MoonBin run examples/linkset_json
+    $out | Out-Host
+    if (-not ($out -match '"linkset"')) { throw "example did not emit linkset JSON" }
+    if (-not ($out -match 'back to a Link header:')) { throw "example did not convert back" }
+    if (-not ($out -match 'rel="stylesheet"')) { throw "round-trip lost the stylesheet relation" }
+}
+
+Write-Host "--- repository checks ---"
+Step "python scripts/count_code.py" {
+    & python scripts/count_code.py
+}
+Step "python scripts/verify_iana_snapshot.py" {
+    & python scripts/verify_iana_snapshot.py
+}
+
+Write-Host ""
+Write-Host "ran $steps verification steps"
+if ($failures.Count -gt 0) {
+    Write-Host "FAILED: $($failures.Count) step(s):"
+    $failures | ForEach-Object { Write-Host "  - $_" }
+    exit 1
+}
+Write-Host "ALL CHECKS PASSED"
+exit 0

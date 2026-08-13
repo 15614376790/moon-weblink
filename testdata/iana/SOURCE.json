@@ -1,0 +1,8 @@
+{
+  "name": "IANA Link Relation Types registry snapshot",
+  "source_url": "https://www.iana.org/assignments/link-relations/link-relations-1.csv",
+  "retrieved_at": "2026-08-11",
+  "sha256": "37109cf6ccf9e4e5e035e8ca1d2fb9f41f5972f7656c033f07e9c58a66769dd4",
+  "record_count": 134,
+  "notes": "Offline snapshot used by the offline registry in relation_registry.mbt. The MoonBit runtime never accesses this URL; the snapshot is only refreshed by an explicit developer action (scripts/import_iana_relations.py --refresh)."
+}
