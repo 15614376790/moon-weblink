@@ -11,7 +11,7 @@ GitHub (see the repository link in the [README](README.md)). It has no CI
 configuration and no Releases; contributions happen as pull requests or file
 changes in this working tree. The scope is fixed by the project
 specification: a strict RFC 8288 / RFC 9264 toolkit with the module name
-`15614376790/moon-weblink` at version `0.1.0-dev`. Keep the scope — a change that
+`15614376790/moon-weblink` at version `0.1.0`. Keep the scope — a change that
 pulls in a large new dependency or a full HTTP client is out of scope.
 
 ## Ground rules
@@ -22,9 +22,10 @@ pulls in a large new dependency or a full HTTP client is out of scope.
    the maintainer's approval.
 2. **No fabricated identity.** Do not invent author names, emails, phones,
    schools, companies, orgs, GitHub usernames or Mooncakes usernames in any
-   file, and do not add `repository`/`homepage`/`author`/`maintainer`/`email`
-   to `moon.mod`. Commit identity is each contributor's own, configured in
-   their own git config.
+   file, and do not add `homepage`/`author`/`maintainer`/`email` to
+   `moon.mod` (the only repository-metadata field present is `repository`,
+   pointing at the real GitHub repository). Commit identity is each
+   contributor's own, configured in their own git config.
 3. **No fake metadata.** Do not add fake GitHub URLs or a fabricated copyright
    holder. The LICENSE is Apache-2.0 as checked in.
 4. **Keep the budgets.** See [Testing](#the-verification-gate); the line
@@ -64,17 +65,19 @@ Before considering a change done, run the full gate from the repository root:
 powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1
 ```
 
-This runs the 25 steps:
+This runs 34 steps:
 
 1. `moon fmt --check`.
 2. `moon check` / `moon build` / `moon test` for each of `wasm-gc`, `js`,
-   `native`.
-3. CLI smoke tests (stats, parse, canonicalize, validate, audit, relation,
-   linkset JSON).
-4. The five examples plus the header → JSON → header round-trip assertion.
-5. `scripts/count_code.py` — code-line budgets per area and the named-test
+   `native` (9 steps).
+3. Core CLI smoke tests (version, parse, canonicalize with mixed-case
+   parameter names, relation lookup) on each target (12 steps).
+4. CLI content assertions (stats, validate-malformed, audit-`rev`, linkset
+   JSON emission).
+5. The five examples plus the header → JSON → header round-trip assertion.
+6. `scripts/count_code.py` — code-line budgets per area and the named-test
    count (100–140).
-6. `scripts/verify_iana_snapshot.py` — snapshot sha256, record count, and
+7. `scripts/verify_iana_snapshot.py` — snapshot sha256, record count, and
    `generated_relations.mbt` freshness.
 
 The script prints `ALL CHECKS PASSED` on success and exits non-zero otherwise.

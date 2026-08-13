@@ -10,7 +10,7 @@ format — over one shared model. It ships an offline snapshot of the IANA Link
 Relation Types registry, a deterministic audit layer, bounded resource limits,
 and structured errors with UTF-8 byte offsets.
 
-- Module: `15614376790/moon-weblink` (version `0.1.0-dev`)
+- Module: `15614376790/moon-weblink` (version `0.1.0`)
 - Targets: `wasm-gc`, `js`, `native`
 - License: Apache-2.0
 - Repository: <https://github.com/15614376790/moon-weblink>
@@ -27,8 +27,9 @@ and structured errors with UTF-8 byte offsets.
   reference resolution (`Section 5.2.2`), used for targets, anchors and
   resolving relative links.
 - **RFC 9264 Linkset** — both `application/linkset` (multiline text) and
-  `application/linkset+json`, with lossless conversion at the model level
-  between the header, text and JSON forms.
+  `application/linkset+json`, with semantics-preserving conversion at the
+  model level between the header, text and JSON forms for the supported
+  RFC 8288 / RFC 9264 scope.
 - **Offline IANA registry** — 134 relation types bundled as a generated
   snapshot (see `testdata/iana/`); membership checks never touch the network.
 - **Query API** — find and filter links by relation type, media type and
@@ -43,12 +44,12 @@ and structured errors with UTF-8 byte offsets.
 - **CLI** — `weblink-tool` subcommands to parse, validate, canonicalize,
   query, convert, look up relations and audit.
 - **Safety** — truncation-safe (every byte-prefix of any input never panics)
-  and malformed-input-safe; 140 named tests pass on all three targets.
+  and malformed-input-safe; 147 named tests pass on all three targets.
 
 ## Layout
 
 ```
-moon.mod                 module manifest (15614376790/moon-weblink 0.1.0-dev)
+moon.mod                 module manifest (15614376790/moon-weblink 0.1.0)
 lib source (.mbt)        parser, serializer, model, linkset, audit, query, ...
 cmd/weblink-tool/        command-line tool
 examples/                five runnable example programs
@@ -141,7 +142,7 @@ preset; `--json` switches the parse and audit output to machine-readable JSON.
 
 - [Architecture](docs/architecture.md) — modules, data model, error model, determinism.
 - [Specification map](docs/specification-map.md) — every RFC requirement and where it is implemented.
-- [Testing](docs/testing.md) — the 140 tests, property and truncation corpora, targets.
+- [Testing](docs/testing.md) — the 147 tests, property and truncation corpora, targets.
 - [Reproduction](docs/reproduction.md) — how to reproduce every number in this README.
 - [Security](docs/security.md) — parser safety, resource limits, no network, no secrets.
 - [Limitations](docs/limitations.md) — what this toolkit deliberately does not do.
@@ -154,12 +155,13 @@ preset; `--json` switches the parse and audit output to machine-readable JSON.
 
 Reproduced by `scripts/count_code.py` and `scripts/verify_iana_snapshot.py`:
 
-- 140 named tests, all passing on `wasm-gc`, `js` and `native`.
+- 147 named tests (140 library blackbox tests + 7 CLI argument-handling
+  tests), all passing on `wasm-gc`, `js` and `native`.
 - 1200 deterministic property-test cases (fixed seeds) + 2504 truncation
   (prefix, parser) cases — every byte-prefix of the complex inputs parses
   without panicking.
-- Code lines (blank and comment lines excluded): core 3400, CLI + examples
-  784, tests 1958, total 6142.
+- Code lines (blank and comment lines excluded): core 3403, CLI + examples
+  872, tests 1958, total 6233.
 - 134 relation types in the offline IANA snapshot; the checked-in
   `generated_relations.mbt` matches the snapshot byte-for-byte.
 

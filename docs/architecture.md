@@ -128,7 +128,8 @@ not attempt scheme-specific semantics.
   so serialization is a fixed point.
 
 `conversion.mbt` provides the entry points that convert at the model level, so
-conversions are lossless at the `LinkSet` boundary:
+conversions are semantics-preserving at the `LinkSet` boundary for the
+supported RFC 8288 / RFC 9264 scope:
 
 - header → `LinkSet` → linkset text
 - header → `LinkSet` → linkset JSON

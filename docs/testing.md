@@ -34,10 +34,12 @@ The suite is organized by concern:
 
 ## Named tests
 
-There are **140 named `test "..."` blocks**, which satisfies the process
-specification's range of 100–140. Each block asserts specific behavior; a
-failure names the exact property under test. The count is verified by
-`scripts/count_code.py`.
+The library suite has **140 named `test "..."` blocks**, satisfying the
+process specification's range of 100–140 as counted by `scripts/count_code.py`
+over the root `test_*.mbt` files. The CLI package adds **7 whitebox tests**
+(`cmd/weblink-tool/cli_wbtest.mbt`) covering argv normalization across
+targets, so `moon test` runs **147** named tests in total. Each block asserts
+specific behavior; a failure names the exact property under test.
 
 ## Property cases (deterministic)
 
@@ -54,7 +56,8 @@ collections. Determinism is guaranteed three ways:
 
 The property checks assert the round-trip and normalization invariants: parse
 → serialize → parse is a fixed point, canonicalization is idempotent, linkset
-conversions are lossless at the model boundary, and the audit is order-stable.
+conversions are semantics-preserving at the model boundary for the supported
+scope, and the audit is order-stable.
 
 ## Truncation cases
 
@@ -92,10 +95,10 @@ contains no backend-specific code.
 ## Verification entry points
 
 - `powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1` — runs the
-  25-step end-to-end check (format, three targets, CLI, examples, budgets,
-  IANA snapshot).
+  34-step end-to-end check (format, three targets, per-target CLI smoke,
+  CLI content assertions, examples, budgets, IANA snapshot).
 - `python scripts/count_code.py` — prints code-line counts per area and
-  verifies the line budgets and the 140-test count.
+  verifies the line budgets and the 140-test library count.
 - `python scripts/verify_iana_snapshot.py` — verifies the offline IANA snapshot
   integrity (sha256, record count, generated-file staleness).
 

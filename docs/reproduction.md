@@ -19,19 +19,20 @@ companion to the process specification.
 powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1
 ```
 
-This runs 25 steps. Recorded outcome on 2026-08-11:
+This runs 34 steps. Recorded outcome on 2026-08-13:
 
 ```
-ran 25 verification steps
+ran 34 verification steps
 ALL CHECKS PASSED
 ```
 
-The 25 steps are: `moon fmt --check`; `moon check`/`build`/`test` for each of
-`wasm-gc`, `js`, `native` (9 steps); CLI smoke tests (stats, parse,
-canonicalize with mixed-case parameter names, validate-malformed, audit-`rev`,
-relation lookup, linkset JSON emission — 7 steps); the five examples plus the
-header→JSON→header round-trip assertion (6 steps); and the two Python verifiers
-(2 steps).
+The 34 steps are: `moon fmt --check`; `moon check`/`build`/`test` for each of
+`wasm-gc`, `js`, `native` (9 steps); core CLI smoke tests (version, parse,
+canonicalize with mixed-case parameter names, relation lookup) run on each
+target (12 steps); CLI content assertions (stats, validate-malformed,
+audit-`rev`, linkset JSON emission — 4 steps); the five examples plus the
+header→JSON→header round-trip assertion (6 steps); and the two Python
+verifiers (2 steps).
 
 ## Formatting
 
@@ -53,8 +54,8 @@ moon build --target native
 moon test  --target native
 ```
 
-Recorded: all nine commands pass; `moon test` reports **140** tests passing on
-each target.
+Recorded: all nine commands pass; `moon test` reports **147** tests passing on
+each target (140 library blackbox tests + 7 CLI whitebox tests).
 
 ## CLI smoke tests
 
@@ -66,6 +67,15 @@ moon run cmd/weblink-tool -- validate --input 'not a link'
 moon run cmd/weblink-tool -- audit --input '<https://a.example/>; rel="canonical"; rev="made"'
 moon run cmd/weblink-tool -- relation next
 moon run cmd/weblink-tool -- to-linkset-json --input '<a>; rel=next'
+```
+
+The core smoke tests (version, parse, canonicalize, relation) also run once
+per target in the verification gate, using the toolchain's `--target` flag:
+
+```sh
+moon run --target wasm-gc cmd/weblink-tool -- version
+moon run --target js      cmd/weblink-tool -- parse --input '<https://a.example/>; rel="next"'
+moon run --target native  cmd/weblink-tool -- canonicalize --input '<https://a.example/>; REL="canonical"'
 ```
 
 Recorded behaviors: the canonicalize step prints
@@ -104,25 +114,28 @@ Recorded output (code lines = non-blank, non-comment):
 
 ```
 code lines per area (blank and comment lines excluded):
-  core           3400
-  cli             641
+  core           3403
+  cli             729
   examples        143
-  cli+examples    784
+  cli+examples    872
   test           1958
-  total          6142
+  total          6233
 gross lines including blanks and comments:
-  total          8366
+  total          8505
 named tests      140
-  OK   core 3400 in [3000, 4000]
-  OK   cli+examples 784 in [500, 900]
+  OK   core 3403 in [3000, 4000]
+  OK   cli+examples 872 in [500, 900]
   OK   test 1958 in [1500, 2200]
-  OK   total 6142 in [5000, 7500]
-  OK   total 6142 <= 8000
+  OK   total 6233 in [5000, 7500]
+  OK   total 6233 <= 8000
   OK   named tests 140 in [100, 140]
 all line budgets satisfied.
 ```
 
-`generated_relations.mbt` is excluded from the budgets.
+`generated_relations.mbt` is excluded from the budgets. The 140 named tests
+counted above are the library blackbox tests; `moon test` additionally runs
+the 7 CLI whitebox tests (`cmd/weblink-tool/cli_wbtest.mbt`), for 147 in
+total.
 
 ## IANA snapshot integrity
 
@@ -163,5 +176,6 @@ maintainer's real identity, configured by them in their git config.
 
 Still **not** done, by the project constraints: `moon login`, `moon publish`,
 any `.github/workflows`, Releases, issue/PR templates, any
-`repository`/`homepage`/`author` fields in `moon.mod`, any fake GitHub URLs,
-and any fabricated copyright holder.
+`homepage`/`author` fields in `moon.mod`, any fake GitHub URLs, and any
+fabricated copyright holder. (`moon.mod` does carry a `repository` field — the
+real GitHub URL, finalized together with the 0.1.0 metadata.)

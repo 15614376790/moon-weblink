@@ -25,8 +25,8 @@ out of scope); the entry below covers the 0.1.0 development history.
 - **RFC 9264 Linkset**
   - `linkset_text.mbt`: `application/linkset` text format.
   - `linkset_json.mbt`: `application/linkset+json` with sorted member names.
-  - `conversion.mbt`: lossless header ↔ text ↔ JSON conversion at the model
-    boundary.
+  - `conversion.mbt`: semantics-preserving header ↔ text ↔ JSON conversion at
+    the model boundary for the supported RFC 8288 / RFC 9264 scope.
 - **Offline IANA registry**: 134 relation types in `generated_relations.mbt`
   generated from the pinned snapshot in `testdata/iana/`; `relation_registry.mbt`
   membership and lookup; `relation.mbt` helpers.
@@ -45,7 +45,7 @@ out of scope); the entry below covers the 0.1.0 development history.
   `audit`, `stats`, `version`, `help`.
 - **Examples**: `parse_header`, `pagination`, `linkset_json`, `relation_query`,
   `audit_header`.
-- **Verification tooling**: `scripts/verify_all.ps1` (25 steps),
+- **Verification tooling**: `scripts/verify_all.ps1` (34 steps),
   `scripts/count_code.py` (line budgets, named-test count),
   `scripts/verify_iana_snapshot.py` (snapshot integrity),
   `scripts/import_iana_relations.py` (snapshot → generated data).
@@ -54,9 +54,25 @@ out of scope); the entry below covers the 0.1.0 development history.
   third-party notices.
 - **License**: Apache-2.0 `LICENSE`.
 
+### Changed
+
+- Module namespace renamed from `localdev/moon-weblink` (development
+  placeholder) to `15614376790/moon-weblink`; see `docs/renaming.md` for the
+  rename record.
+- Release metadata finalized: `moon.mod` now declares version `0.1.0` and the
+  repository URL; the CLI version banner is built from
+  `@weblink.library_version()` (single version source alongside `moon.mod`).
+- CLI argument normalization across MoonBit targets: js-style
+  `[node, program.js, args...]` prefixes are stripped by
+  `strip_program_name`, so every backend sees the same user arguments.
+- Verification gate: the core CLI smoke tests (version, parse, canonicalize,
+  relation) now run once per target (wasm-gc, js, native).
+
 ### Tests
 
-- 140 named tests across 16 `test_*.mbt` files, passing on `wasm-gc`, `js` and
+- 147 named tests — 140 library blackbox tests across 16 `test_*.mbt` files
+  plus 7 CLI argument-handling whitebox tests
+  (`cmd/weblink-tool/cli_wbtest.mbt`) — passing on `wasm-gc`, `js` and
   `native`.
 - 1200 deterministic property-test cases (fixed seeds; no `random`/`time`).
 - 2504 truncation cases: every byte-prefix of the complex inputs is parsed and

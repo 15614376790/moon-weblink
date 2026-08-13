@@ -44,7 +44,7 @@ Implemented by the root library; the entry point is `parse_link_header` /
 | §4.2 application/linkset+json format | `linkset_json.mbt` |
 | §4.2 JSON shape: `{"linkset": [{anchor?, <rel>: [{href, ...}]}]}` | `linkset_json.mbt` |
 | member-per-relation structure | `linkset_json.mbt` |
-| lossless conversion between representations | `conversion.mbt` |
+| semantics-preserving conversion between representations (supported scope) | `conversion.mbt` |
 
 ## RFC 8187 — Indicating Character Encoding (extended parameter values)
 
@@ -77,6 +77,6 @@ Implemented by the root library; the entry point is `parse_link_header` /
 
 The hard constraints and verification targets are reproduced in
 [reproduction.md](reproduction.md); the verification entry point is
-[scripts/verify_all.ps1](../scripts/verify_all.ps1) (25 steps) and
+[scripts/verify_all.ps1](../scripts/verify_all.ps1) (34 steps) and
 [scripts/count_code.py](../scripts/count_code.py) (line budgets and named-test
 count).
