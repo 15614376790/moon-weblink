@@ -50,18 +50,64 @@ fn known_command(c : String) -> Bool {
   c == "version"
 }
 
-///| Splits `@env.args()` into the command and its options. `moon run` passes
-
-///| the executable path as `args[0]`, so a leading token that is not itself a
+///|
+/// True when the token is a bare JavaScript/WASM engine name, with or
+/// without the Windows `.exe` suffix.
+fn is_engine_name(a : String) -> Bool {
+  a == "node" ||
+  a == "node.exe" ||
+  a == "deno" ||
+  a == "deno.exe" ||
+  a == "bun" ||
+  a == "bun.exe"
+}
 
 ///|
-/// command is dropped.
+/// True when the token is a program path: it contains a directory separator
+/// and ends in an executable extension.
+fn is_program_path(a : String) -> Bool {
+  (a.contains("\\") || a.contains("/")) &&
+  (a.has_suffix(".exe") ||
+    a.has_suffix(".js") ||
+    a.has_suffix(".cjs") ||
+    a.has_suffix(".mjs") ||
+    a.has_suffix(".wasm"))
+}
+
+///|
+/// The number of leading argv tokens that are runtime/program prefixes:
+/// engine names (`node`, `deno`, `bun`) and program paths. Scanning stops at
+/// the first known command or the first token that is neither, so a real CLI
+/// command or user input is never consumed.
+fn strip_program_name(args : Array[String]) -> Int {
+  let mut start = 0
+  while start < args.length() {
+    if known_command(args[start]) {
+      break
+    }
+    if !is_engine_name(args[start]) && !is_program_path(args[start]) {
+      break
+    }
+    start = start + 1
+  }
+  start
+}
+
+///|
+/// Splits `@env.args()` into the command and its options.
+///
+/// Each MoonBit target prefixes `@env.args()` differently: native and
+/// wasm-gc pass `[program, args...]`, js passes `[node, program.js,
+/// args...]`. `strip_program_name` skips those prefixes uniformly. As a
+/// fallback for platforms that report a bare executable name without a
+/// directory separator, a single leading token that is not a known command
+/// is dropped as well.
 fn split_command(args : Array[String]) -> (String, Array[String]) {
   if args.is_empty() {
     return ("help", Array::new())
   }
-  let mut start = 0
-  if !known_command(args[0]) {
+  let mut start = strip_program_name(args)
+  if start == 0 && !known_command(args[0]) {
     start = 1
   }
   if start >= args.length() {

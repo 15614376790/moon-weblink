@@ -5,8 +5,11 @@
 // `Unit` (there is no portable way to set the process exit code), so the CLI
 // reports every outcome as one deterministic line of stdout text, which makes
 // it safe to script by grepping that text. The same binary builds unchanged
-// for the wasm-gc, js and native targets. `moon run` passes the executable
-// path as `@env.args()[0]`; `split_command` drops that leading token.
+// for the wasm-gc, js and native targets. Each target prefixes
+// `@env.args()` differently (native/wasm-gc: `[program, args...]`, js:
+// `[node, program.js, args...]`); `split_command` normalizes those prefixes
+// via `strip_program_name` so the parser sees the same user arguments on
+// every backend.
 
 ///|
 fn main {
