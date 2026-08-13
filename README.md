@@ -13,6 +13,7 @@ and structured errors with UTF-8 byte offsets.
 - Module: `localdev/moon-weblink` (version `0.1.0-dev`)
 - Targets: `wasm-gc`, `js`, `native`
 - License: Apache-2.0
+- Repository: <https://github.com/15614376790/moon-weblink>
 
 ## Features
 

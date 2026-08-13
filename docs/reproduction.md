@@ -11,6 +11,7 @@ companion to the process specification.
   recorded run; any MoonBit build that accepts the same CLI should work).
 - Python 3 for the two verifier scripts.
 - Working directory: the project root `D:\Moonbit\projects\project9\moon-weblink`.
+- Repository: <https://github.com/15614376790/moon-weblink>.
 
 ## One-shot verification
 
@@ -156,7 +157,8 @@ suite itself (a mismatch fails the build).
 
 The project was originally delivered as a complete local directory. At the
 maintainer's request it is now versioned with git and published to GitHub
-under the maintainer's own account; commits are authored with the
+under the maintainer's own account (`15614376790`), at
+<https://github.com/15614376790/moon-weblink>; commits are authored with the
 maintainer's real identity, configured by them in their git config.
 
 Still **not** done, by the project constraints: `moon login`, `moon publish`,
