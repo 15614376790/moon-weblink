@@ -279,7 +279,7 @@ fn cmd_audit(o : CliOptions) -> Unit {
 /// `stats`: library statistics — the offline registry size and the resource
 /// limit presets.
 fn cmd_stats(_o : CliOptions) -> Unit {
-  println("weblink-tool 0.1.0-dev (15614376790/moon-weblink)")
+  println(version_banner())
   println(
     "registered relations (offline IANA snapshot): \{@weblink.registered_relation_count().to_string()}",
   )

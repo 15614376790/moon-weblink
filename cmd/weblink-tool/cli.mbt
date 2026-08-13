@@ -125,6 +125,13 @@ fn parse_options(args : Array[String]) -> CliOptions {
 }
 
 ///|
+/// The version banner printed by `version` and `stats`, built from the
+/// library's single-source version string.
+fn version_banner() -> String {
+  "weblink-tool \{@weblink.library_version()} (15614376790/moon-weblink)"
+}
+
+///|
 /// The limits preset named by `--limits` (default / strict / permissive).
 fn resolve_limits(preset : String) -> @weblink.Limits {
   if preset == "strict" {

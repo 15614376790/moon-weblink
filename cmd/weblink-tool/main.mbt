@@ -27,7 +27,7 @@ fn run_cli(args : Array[String]) -> Unit {
     return
   }
   if cmd == "version" {
-    println("weblink-tool 0.1.0-dev (15614376790/moon-weblink)")
+    println(version_banner())
     return
   }
   if opts.help {

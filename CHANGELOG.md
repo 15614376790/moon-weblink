@@ -1,11 +1,11 @@
 # Changelog
 
 All notable changes to `moon-weblink` are documented here, following
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project is at
-version `0.1.0-dev`; there is no released version yet, so there are no tagged
-releases. This file records the development history of the working tree.
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The current version
+is `0.1.0`. No tagged GitHub Release exists for this version (releases are
+out of scope); the entry below covers the 0.1.0 development history.
 
-## [Unreleased]
+## [0.1.0] - 2026-08-13
 
 ### Added
 
