@@ -174,8 +174,12 @@ under the maintainer's own account (`15614376790`), at
 <https://github.com/15614376790/moon-weblink>; commits are authored with the
 maintainer's real identity, configured by them in their git config.
 
-Still **not** done, by the project constraints: `moon login`, `moon publish`,
-any `.github/workflows`, Releases, issue/PR templates, any
-`homepage`/`author` fields in `moon.mod`, any fake GitHub URLs, and any
-fabricated copyright holder. (`moon.mod` does carry a `repository` field — the
-real GitHub URL, finalized together with the 0.1.0 metadata.)
+On 2026-08-13 the maintainer ran `moon login` and `moon publish`, and version
+`0.1.0` was published to Mooncakes as `15614376790/moon-weblink`, at
+<https://mooncakes.io/package/15614376790/moon-weblink>.
+
+Still **not** done, by the project constraints: any `.github/workflows`,
+Releases, issue/PR templates, any `homepage`/`author` fields in `moon.mod`,
+any fake GitHub URLs, and any fabricated copyright holder. (`moon.mod` does
+carry a `repository` field — the real GitHub URL, finalized together with the
+0.1.0 metadata.)

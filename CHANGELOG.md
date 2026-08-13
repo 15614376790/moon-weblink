@@ -7,6 +7,9 @@ out of scope); the entry below covers the 0.1.0 development history.
 
 ## [0.1.0] - 2026-08-13
 
+Version `0.1.0` is published to Mooncakes as `15614376790/moon-weblink`
+(<https://mooncakes.io/package/15614376790/moon-weblink>).
+
 ### Added
 
 - **RFC 8288 Web Linking core**

@@ -16,10 +16,13 @@ pulls in a large new dependency or a full HTTP client is out of scope.
 
 ## Ground rules
 
-1. **No Mooncakes publishing.** Do not run `moon login` or `moon publish`.
-   Git is the normal development workflow (commit, push, pull request); the
-   project has no CI configuration or Releases, so do not add them without
-   the maintainer's approval.
+1. **Publishing to Mooncakes.** The package is published to Mooncakes as
+   `15614376790/moon-weblink`, at
+   <https://mooncakes.io/package/15614376790/moon-weblink>. Publishing is
+   done by the maintainer with `moon publish`; contributors should not run
+   `moon login` or `moon publish` — send a pull request instead. The project
+   has no CI configuration or Releases, so do not add them without the
+   maintainer's approval.
 2. **No fabricated identity.** Do not invent author names, emails, phones,
    schools, companies, orgs, GitHub usernames or Mooncakes usernames in any
    file, and do not add `homepage`/`author`/`maintainer`/`email` to

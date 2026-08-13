@@ -60,6 +60,9 @@ authoritative check.
 
 ## Publishing
 
-The project is hosted on GitHub; publishing to Mooncakes is **out of scope**
-(no `moon login`, no `moon publish`). If the GitHub repository is renamed,
+The project is hosted on GitHub and published to Mooncakes as
+`15614376790/moon-weblink`, at
+<https://mooncakes.io/package/15614376790/moon-weblink>. The Mooncakes
+package name is the module name in `moon.mod`, so a module rename also
+changes the Mooncakes package identity. If the GitHub repository is renamed,
 update the git remote accordingly (`git remote set-url origin <new-url>`).
