@@ -1,6 +1,6 @@
 pkgtype(kind: "executable")
 
 import {
-  "localdev/moon-weblink" @weblink,
+  "15614376790/moon-weblink" @weblink,
   "moonbitlang/core/env",
 }

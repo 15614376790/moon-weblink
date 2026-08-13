@@ -1,96 +1,65 @@
-# Renaming
+# Module rename record
 
-This module ships as `localdev/moon-weblink` version `0.1.0-dev`. `localdev`
-is a placeholder namespace; before publishing, moving the module to your own
-namespace requires a small, mechanical rename. This document lists every place
-that must change.
+This document records the completed namespace rename of this module and
+explains how to perform another rename in the future.
 
-## What to change
+## Completed rename
 
-### 1. `moon.mod`
-
-Change the `name` line. Nothing else in `moon.mod` needs to move:
-
-```
-name = "your-namespace/moon-weblink"
+```text
+localdev/moon-weblink
+→
+15614376790/moon-weblink
 ```
 
-The spec constraint forbids `repository`, `homepage`, `author`, `maintainer`
-and `email` fields, so leave them out. Update `version` when you are ready to
-publish (e.g. `0.1.0`).
+Done in commit `chore: rename module namespace to 15614376790/moon-weblink`.
+The old `localdev` namespace was a development placeholder; the module now
+lives under the owner's real GitHub namespace
+(<https://github.com/15614376790/moon-weblink>).
 
-### 2. Package `moon.pkg` files
+No runtime reference to the old namespace remains: `moon.mod` and every
+`moon.pkg` import use the new namespace. Verify with:
 
-Every `moon.pkg` in the module imports the library package by its full name.
-There are three places:
-
-- `cmd/weblink-tool/moon.pkg`
-- `examples/*/moon.pkg` (five directories)
-
-Each import line of the form
-
-```
-"localdev/moon-weblink"
+```sh
+git grep "localdev/moon-weblink"
 ```
 
-must become
+Only this rename record may mention the old namespace.
 
-```
-"your-namespace/moon-weblink"
-```
+## What changed
 
-### 3. Tests and examples that reference the module path
+- `moon.mod` — module name.
+- `cmd/weblink-tool/moon.pkg` — library import.
+- `examples/*/moon.pkg` (five directories) — library import.
+- `README.md`, `CONTRIBUTING.md` — module references.
+- `cmd/weblink-tool` version banner — module name printed by `version` and
+  `stats`.
 
-The tests import nothing by name (they live in the same package), but any
-`@weblink.` references in examples go through the import in their `moon.pkg`;
-changing step 2 fixes them all.
+The library source never hard-codes the module path: consumers import the
+module by its full name and alias it (`@weblink`), so a rename only touches
+`moon.pkg` import lines plus documentation. No `.mbt` library file contains
+the module name.
 
-### 4. Documentation and metadata strings
+## Renaming again in the future
 
-The following text files mention the module name and are part of the
-deliverable; update the occurrences of `localdev/moon-weblink`:
+To move the module to another namespace, change:
 
-- `README.md` (module line, layout block, quick-start text)
-- `docs/reproduction.md` (working-directory example)
-- `docs/architecture.md` (layout description)
-- `docs/renaming.md` (this file, at the top)
+1. `moon.mod` — `name = "your-namespace/moon-weblink"`.
+2. Every `moon.pkg` that imports the library by full name:
+   `cmd/weblink-tool/moon.pkg` and `examples/*/moon.pkg`.
+3. Documentation strings that mention the module name (README, CONTRIBUTING,
+   CHANGELOG, this file).
 
-Also update the `description` in `moon.mod` only if your published description
-differs.
-
-## What does NOT need to change
-
-- **Source files.** The library source uses `@weblink` only as an *alias*
-  (defined in the importing `moon.pkg`); no `.mbt` file hard-codes the module
-  path. `@weblink.` is a local alias, not the module name.
-- **`generated_relations.mbt`.** Generated data contains no module path.
-- **Scripts.** `count_code.py`, `verify_iana_snapshot.py` and
-  `import_iana_relations.py` operate on relative paths and never reference the
-  module name.
-- **`verify_all.ps1`.** It uses `moon` with relative paths only.
-
-## Verification after renaming
-
-After changing the name, run the full gate:
+Then re-run the full gate:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1
 ```
 
-and confirm the module line in `moon.mod` shows your namespace:
-
-```sh
-moon info 2>&1 | head -n 5   # or: inspect moon.mod directly
-```
-
-The 25 steps (format, three targets, CLI, examples, budgets, IANA snapshot)
-are all name-independent, so the only new risk from a rename is a missed
-import string, which the build would catch immediately.
+A missed import string fails the build immediately, so the gate is the
+authoritative check.
 
 ## Publishing
 
 The project is hosted on GitHub; publishing to Mooncakes is **out of scope**
-(no `moon login`, no `moon publish`). When you are ready to publish under your
-own namespace, follow the MoonBit publishing guide, keeping in mind that this
-document's rename steps must come first. If the GitHub repository is renamed,
+(no `moon login`, no `moon publish`). If the GitHub repository is renamed,
 update the git remote accordingly (`git remote set-url origin <new-url>`).

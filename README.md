@@ -10,7 +10,7 @@ format — over one shared model. It ships an offline snapshot of the IANA Link
 Relation Types registry, a deterministic audit layer, bounded resource limits,
 and structured errors with UTF-8 byte offsets.
 
-- Module: `localdev/moon-weblink` (version `0.1.0-dev`)
+- Module: `15614376790/moon-weblink` (version `0.1.0-dev`)
 - Targets: `wasm-gc`, `js`, `native`
 - License: Apache-2.0
 - Repository: <https://github.com/15614376790/moon-weblink>
@@ -48,7 +48,7 @@ and structured errors with UTF-8 byte offsets.
 ## Layout
 
 ```
-moon.mod                 module manifest (localdev/moon-weblink 0.1.0-dev)
+moon.mod                 module manifest (15614376790/moon-weblink 0.1.0-dev)
 lib source (.mbt)        parser, serializer, model, linkset, audit, query, ...
 cmd/weblink-tool/        command-line tool
 examples/                five runnable example programs
@@ -145,7 +145,7 @@ preset; `--json` switches the parse and audit output to machine-readable JSON.
 - [Reproduction](docs/reproduction.md) — how to reproduce every number in this README.
 - [Security](docs/security.md) — parser safety, resource limits, no network, no secrets.
 - [Limitations](docs/limitations.md) — what this toolkit deliberately does not do.
-- [Renaming](docs/renaming.md) — how to move the module from `localdev/moon-weblink` to your own namespace.
+- [Renaming](docs/renaming.md) — record of the completed `localdev/moon-weblink` → `15614376790/moon-weblink` namespace rename, and how to rename again.
 - [CHANGELOG](CHANGELOG.md) — release history.
 - [CONTRIBUTING](CONTRIBUTING.md) — how to build, test and contribute.
 - [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md) — IANA registry data provenance.

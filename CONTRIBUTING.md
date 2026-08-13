@@ -11,7 +11,7 @@ GitHub (see the repository link in the [README](README.md)). It has no CI
 configuration and no Releases; contributions happen as pull requests or file
 changes in this working tree. The scope is fixed by the project
 specification: a strict RFC 8288 / RFC 9264 toolkit with the module name
-`localdev/moon-weblink` at version `0.1.0-dev`. Keep the scope — a change that
+`15614376790/moon-weblink` at version `0.1.0-dev`. Keep the scope — a change that
 pulls in a large new dependency or a full HTTP client is out of scope.
 
 ## Ground rules

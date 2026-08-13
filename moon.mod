@@ -1,4 +1,4 @@
-name = "localdev/moon-weblink"
+name = "15614376790/moon-weblink"
 
 version = "0.1.0-dev"
 
