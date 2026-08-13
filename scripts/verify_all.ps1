@@ -3,7 +3,9 @@
 # Runs, in order:
 #   1.  moon fmt --check
 #   2.  moon check / build / test for each of the wasm-gc, js and native targets
-#   3.  CLI smoke tests (stats, parse, audit, relation, conversion round-trip)
+#   3.  CLI smoke tests: version / parse / canonicalize / relation run on
+#       every target (wasm-gc, js, native), plus content assertions
+#       (stats, validate, audit, conversion round-trip)
 #   4.  every example program
 #   5.  scripts/count_code.py          (line budgets, named-test count)
 #   6.  scripts/verify_iana_snapshot.py (offline IANA snapshot integrity)
@@ -13,6 +15,9 @@
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1
 #   powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1 -MoonBin D:\Moonbit\bin\moon.exe
+#
+# The moon binary is resolved in this order: -MoonBin > $env:MOON_BIN > PATH
+# > D:\Moonbit\bin\moon.exe.
 
 param(
     [string]$MoonBin = ""
@@ -23,17 +28,20 @@ $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
 
 if ($MoonBin -eq "") {
-    # Try PATH, then the common MoonBit install locations.
-    $candidate = Get-Command moon -ErrorAction SilentlyContinue
-    if ($candidate) {
-        $MoonBin = $candidate.Source
-    } elseif (Test-Path "$env:USERPROFILE\.moon\bin\moon.exe") {
-        $MoonBin = "$env:USERPROFILE\.moon\bin\moon.exe"
-    } elseif (Test-Path "D:\Moonbit\bin\moon.exe") {
-        $MoonBin = "D:\Moonbit\bin\moon.exe"
+    # Resolution order: -MoonBin (explicit) > $env:MOON_BIN > PATH > known
+    # install location.
+    if ($env:MOON_BIN -and (Test-Path $env:MOON_BIN)) {
+        $MoonBin = $env:MOON_BIN
     } else {
-        Write-Host "FAIL: could not locate the moon binary (pass -MoonBin)."
-        exit 1
+        $candidate = Get-Command moon -ErrorAction SilentlyContinue
+        if ($candidate) {
+            $MoonBin = $candidate.Source
+        } elseif (Test-Path "D:\Moonbit\bin\moon.exe") {
+            $MoonBin = "D:\Moonbit\bin\moon.exe"
+        } else {
+            Write-Host "FAIL: could not locate the moon binary (pass -MoonBin or set MOON_BIN)."
+            exit 1
+        }
     }
 }
 Write-Host "moon: $MoonBin"
@@ -67,15 +75,35 @@ foreach ($t in @("wasm-gc", "js", "native")) {
     Step "moon test  --target $t"   { & $MoonBin test --target $t }
 }
 
-Write-Host "--- CLI smoke tests ---"
+Write-Host "--- CLI smoke tests (per target) ---"
+foreach ($t in @("wasm-gc", "js", "native")) {
+    Step "cli [$t]: version" {
+        $out = & $MoonBin run --target $t cmd/weblink-tool -- version
+        $out | Out-Host
+        if (-not ($out -match "weblink-tool 0\.1\.0 \(15614376790/moon-weblink\)")) {
+            throw "expected the version banner"
+        }
+    }
+    Step "cli [$t]: parse a Link header" {
+        $out = & $MoonBin run --target $t cmd/weblink-tool -- parse --input '<https://a.example/>; rel="next"'
+        $out | Out-Host
+        if (-not ($out -match "next")) { throw "expected the next relation in the parse output" }
+    }
+    Step "cli [$t]: canonicalize with mixed-case parameter names" {
+        $out = & $MoonBin run --target $t cmd/weblink-tool -- canonicalize --input '<https://a.example/>; REL="canonical"'
+        $out | Out-Host
+        if (-not ($out -match 'rel="canonical"')) { throw "expected the canonical form" }
+    }
+    Step "cli [$t]: relation registry lookup" {
+        $out = & $MoonBin run --target $t cmd/weblink-tool -- relation next
+        $out | Out-Host
+        if (-not ($out -match "next")) { throw "expected the next registry entry" }
+    }
+}
+
+Write-Host "--- CLI content assertions (default target) ---"
 Step "cli: stats" {
     & $MoonBin run cmd/weblink-tool -- stats | Out-Host
-}
-Step "cli: parse a Link header" {
-    & $MoonBin run cmd/weblink-tool -- parse --input '<https://a.example/>; rel="next"' | Out-Host
-}
-Step "cli: canonicalize with mixed-case parameter names" {
-    & $MoonBin run cmd/weblink-tool -- canonicalize --input '<https://a.example/>; REL="canonical"' | Out-Host
 }
 Step "cli: validate a malformed value reports invalid" {
     $out = & $MoonBin run cmd/weblink-tool -- validate --input 'not a link'
@@ -86,9 +114,6 @@ Step "cli: audit flags the deprecated rev parameter" {
     $out = & $MoonBin run cmd/weblink-tool -- audit --input '<https://a.example/>; rel="canonical"; rev="made"'
     $out | Out-Host
     if (-not ($out -match "deprecated-rev")) { throw "expected a deprecated-rev finding" }
-}
-Step "cli: relation registry lookup" {
-    & $MoonBin run cmd/weblink-tool -- relation next | Out-Host
 }
 Step "cli: to-linkset-json emits an RFC 9264 linkset" {
     # Windows PowerShell 5.1 cannot pass embedded double quotes through a

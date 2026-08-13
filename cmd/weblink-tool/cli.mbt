@@ -67,11 +67,13 @@ fn is_engine_name(a : String) -> Bool {
 /// and ends in an executable extension.
 fn is_program_path(a : String) -> Bool {
   (a.contains("\\") || a.contains("/")) &&
-  (a.has_suffix(".exe") ||
+  (
+    a.has_suffix(".exe") ||
     a.has_suffix(".js") ||
     a.has_suffix(".cjs") ||
     a.has_suffix(".mjs") ||
-    a.has_suffix(".wasm"))
+    a.has_suffix(".wasm")
+  )
 }
 
 ///|
