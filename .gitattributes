@@ -1,0 +1,2 @@
+# Preserve the exact IANA snapshot bytes recorded in SOURCE.json on every OS.
+testdata/iana/link-relations.csv binary
