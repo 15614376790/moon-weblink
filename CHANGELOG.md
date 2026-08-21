@@ -2,8 +2,17 @@
 
 All notable changes to `moon-weblink` are documented here, following
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The current version
-is `0.1.0`. No tagged GitHub Release exists for this version (releases are
-out of scope); the entry below covers the 0.1.0 development history.
+is `0.1.1`.
+
+## [0.1.1] - 2026-08-21
+
+### Changed
+
+- Prepared the final-acceptance release without changing core RFC behavior.
+- Expanded the strict verification gate to `wasm`, `wasm-gc`, `js` and
+  `native`, with warnings denied for checks and tests.
+- Added GitHub Actions CI and refreshed the reproducibility and submission
+  documentation for the final deliverable.
 
 ## [0.1.0] - 2026-08-13
 

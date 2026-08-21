@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up MoonBit
+        uses: hustcer/setup-moonbit@v1.22
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show toolchain
+        run: moon version --all
+
+      - name: Format and interface checks
+        run: |
+          moon fmt --check
+          moon info
+
+      - name: Strict four-target validation
+        run: |
+          moon check --target all --deny-warn
+          moon build --target all
+          moon test --target all --deny-warn
+
+      - name: CLI smoke test
+        run: |
+          moon run cmd/weblink-tool -- version | grep 'weblink-tool 0.1.1'
+          moon run cmd/weblink-tool -- parse --input '<https://a.example/>; rel=next' | grep next
+
+      - name: Run examples
+        run: |
+          moon run examples/parse_header
+          moon run examples/pagination
+          moon run examples/linkset_json
+          moon run examples/relation_query
+          moon run examples/audit_header
+
+      - name: Repository integrity checks
+        run: |
+          python3 scripts/count_code.py
+          python3 scripts/verify_iana_snapshot.py
+          moon package --list

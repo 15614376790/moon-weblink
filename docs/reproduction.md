@@ -7,8 +7,8 @@ companion to the process specification.
 ## Environment
 
 - Windows 11 (build 22621), PowerShell 5.1, Git Bash.
-- MoonBit toolchain: `moon 0.1.20260713` (at `D:\Moonbit\bin\moon.exe` in the
-  recorded run; any MoonBit build that accepts the same CLI should work).
+- MoonBit toolchain: `moon 0.1.20260819` (at `D:\Moonbit\bin\moon.exe` in the
+  recorded run; a compatible newer toolchain should also work).
 - Python 3 for the two verifier scripts.
 - Working directory: the project root `D:\Moonbit\projects\project9\moon-weblink`.
 - Repository: <https://github.com/15614376790/moon-weblink>.
@@ -19,20 +19,20 @@ companion to the process specification.
 powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1
 ```
 
-This runs 34 steps. Recorded outcome on 2026-08-13:
+This runs 43 steps. Recorded outcome on 2026-08-21:
 
 ```
-ran 34 verification steps
+ran 43 verification steps
 ALL CHECKS PASSED
 ```
 
-The 34 steps are: `moon fmt --check`; `moon check`/`build`/`test` for each of
-`wasm-gc`, `js`, `native` (9 steps); core CLI smoke tests (version, parse,
-canonicalize with mixed-case parameter names, relation lookup) run on each
-target (12 steps); CLI content assertions (stats, validate-malformed,
-audit-`rev`, linkset JSON emission — 4 steps); the five examples plus the
-header→JSON→header round-trip assertion (6 steps); and the two Python
-verifiers (2 steps).
+The 43 steps are: `moon fmt --check`; `moon info`; strict
+`moon check`/`build`/`test` for `wasm`, `wasm-gc`, `js`, `native` (12 steps);
+core CLI smoke tests (version, parse, canonicalize with mixed-case parameter
+names, relation lookup) on each target (16 steps); CLI content assertions
+(stats, validate-malformed, audit-`rev`, linkset JSON emission — 4 steps);
+the five examples plus the header→JSON→header round-trip assertion (6 steps);
+the two Python verifiers (2 steps); and `moon package --list`.
 
 ## Formatting
 
@@ -43,18 +43,21 @@ moon fmt --check        # passes; no formatting drift
 ## Check / build / test across targets
 
 ```sh
-moon check --target wasm-gc
+moon check --target wasm --deny-warn
+moon build --target wasm
+moon test  --target wasm --deny-warn
+moon check --target wasm-gc --deny-warn
 moon build --target wasm-gc
-moon test  --target wasm-gc
-moon check --target js
+moon test  --target wasm-gc --deny-warn
+moon check --target js --deny-warn
 moon build --target js
-moon test  --target js
-moon check --target native
+moon test  --target js --deny-warn
+moon check --target native --deny-warn
 moon build --target native
-moon test  --target native
+moon test  --target native --deny-warn
 ```
 
-Recorded: all nine commands pass; `moon test` reports **147** tests passing on
+Recorded: all twelve commands pass; `moon test` reports **147** tests passing on
 each target (140 library blackbox tests + 7 CLI whitebox tests).
 
 ## CLI smoke tests
@@ -73,6 +76,7 @@ The core smoke tests (version, parse, canonicalize, relation) also run once
 per target in the verification gate, using the toolchain's `--target` flag:
 
 ```sh
+moon run --target wasm    cmd/weblink-tool -- version
 moon run --target wasm-gc cmd/weblink-tool -- version
 moon run --target js      cmd/weblink-tool -- parse --input '<https://a.example/>; rel="next"'
 moon run --target native  cmd/weblink-tool -- canonicalize --input '<https://a.example/>; REL="canonical"'
@@ -174,12 +178,11 @@ under the maintainer's own account (`15614376790`), at
 <https://github.com/15614376790/moon-weblink>; commits are authored with the
 maintainer's real identity, configured by them in their git config.
 
-On 2026-08-13 the maintainer ran `moon login` and `moon publish`, and version
-`0.1.0` was published to Mooncakes as `15614376790/moon-weblink`, at
-<https://mooncakes.io/package/15614376790/moon-weblink>.
+Version `0.1.0` was published to Mooncakes on 2026-08-13. The final-acceptance
+release is version `0.1.1`, published under the same package name at
+<https://mooncakes.io/package/15614376790/moon-weblink> after the local and
+GitHub Actions gates pass.
 
-Still **not** done, by the project constraints: any `.github/workflows`,
-Releases, issue/PR templates, any `homepage`/`author` fields in `moon.mod`,
-any fake GitHub URLs, and any fabricated copyright holder. (`moon.mod` does
-carry a `repository` field — the real GitHub URL, finalized together with the
-0.1.0 metadata.)
+The repository now includes `.github/workflows/ci.yml`, which repeats the
+strict four-target build and test checks on pushes and pull requests. No
+fabricated author metadata or unrelated release assets are added.

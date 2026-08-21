@@ -7,11 +7,10 @@ repository.
 ## Project status and scope
 
 `moon-weblink` is a MoonBit library project, versioned with git and hosted on
-GitHub (see the repository link in the [README](README.md)). It has no CI
-configuration and no Releases; contributions happen as pull requests or file
-changes in this working tree. The scope is fixed by the project
+GitHub (see the repository link in the [README](README.md)). GitHub Actions
+runs the same strict verification gate used locally. The scope is fixed by the project
 specification: a strict RFC 8288 / RFC 9264 toolkit with the module name
-`15614376790/moon-weblink` at version `0.1.0`. Keep the scope — a change that
+`15614376790/moon-weblink` at version `0.1.1`. Keep the scope — a change that
 pulls in a large new dependency or a full HTTP client is out of scope.
 
 ## Ground rules
@@ -21,8 +20,8 @@ pulls in a large new dependency or a full HTTP client is out of scope.
    <https://mooncakes.io/package/15614376790/moon-weblink>. Publishing is
    done by the maintainer with `moon publish`; contributors should not run
    `moon login` or `moon publish` — send a pull request instead. The project
-   has no CI configuration or Releases, so do not add them without the
-   maintainer's approval.
+   is continuously checked by the repository workflow; releases remain a
+   maintainer responsibility.
 2. **No fabricated identity.** Do not invent author names, emails, phones,
    schools, companies, orgs, GitHub usernames or Mooncakes usernames in any
    file, and do not add `homepage`/`author`/`maintainer`/`email` to
@@ -37,7 +36,7 @@ pulls in a large new dependency or a full HTTP client is out of scope.
 
 ## Development environment
 
-- MoonBit toolchain (developed against `moon 0.1.20260713`).
+- MoonBit toolchain (verified against `moon 0.1.20260819` or compatible newer).
 - Python 3 for the verification scripts.
 - Windows 11 / PowerShell 5.1 (the `verify_all.ps1` script) or any shell for
   the individual `moon` commands.
@@ -68,20 +67,22 @@ Before considering a change done, run the full gate from the repository root:
 powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1
 ```
 
-This runs 34 steps:
+This runs 43 steps:
 
 1. `moon fmt --check`.
-2. `moon check` / `moon build` / `moon test` for each of `wasm-gc`, `js`,
-   `native` (9 steps).
-3. Core CLI smoke tests (version, parse, canonicalize with mixed-case
-   parameter names, relation lookup) on each target (12 steps).
-4. CLI content assertions (stats, validate-malformed, audit-`rev`, linkset
+2. `moon info` to refresh and validate generated package interfaces.
+3. Strict `moon check` / `moon build` / `moon test` for each of `wasm`,
+   `wasm-gc`, `js`, `native` (12 steps; check/test deny warnings).
+4. Core CLI smoke tests (version, parse, canonicalize with mixed-case
+   parameter names, relation lookup) on each target (16 steps).
+5. CLI content assertions (stats, validate-malformed, audit-`rev`, linkset
    JSON emission).
-5. The five examples plus the header → JSON → header round-trip assertion.
-6. `scripts/count_code.py` — code-line budgets per area and the named-test
+6. The five examples plus the header → JSON → header round-trip assertion.
+7. `scripts/count_code.py` — code-line budgets per area and the named-test
    count (100–140).
-7. `scripts/verify_iana_snapshot.py` — snapshot sha256, record count, and
+8. `scripts/verify_iana_snapshot.py` — snapshot sha256, record count, and
    `generated_relations.mbt` freshness.
+9. `moon package --list` to verify the package surface is discoverable.
 
 The script prints `ALL CHECKS PASSED` on success and exits non-zero otherwise.
 
@@ -89,7 +90,7 @@ You can also run the individual pieces:
 
 ```sh
 moon fmt --check
-moon test --target native      # or wasm-gc / js
+moon test --target native --deny-warn      # or wasm / wasm-gc / js
 python scripts/count_code.py
 python scripts/verify_iana_snapshot.py
 ```

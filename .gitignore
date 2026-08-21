@@ -2,6 +2,7 @@
 _build/
 target/
 .mooncakes/
+pkg.generated.mbti
 
 # Editor and OS files
 .idea/

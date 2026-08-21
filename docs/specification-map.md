@@ -77,6 +77,6 @@ Implemented by the root library; the entry point is `parse_link_header` /
 
 The hard constraints and verification targets are reproduced in
 [reproduction.md](reproduction.md); the verification entry point is
-[scripts/verify_all.ps1](../scripts/verify_all.ps1) (34 steps) and
+[scripts/verify_all.ps1](../scripts/verify_all.ps1) (43 steps) and
 [scripts/count_code.py](../scripts/count_code.py) (line budgets and named-test
 count).

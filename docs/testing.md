@@ -6,7 +6,7 @@ numbers in the [README](../README.md).
 ## Test architecture
 
 All tests live in root `test_*.mbt` files and run under `moon test` for each of
-the three targets (`wasm-gc`, `js`, `native`). There are no external test
+the four targets (`wasm`, `wasm-gc`, `js`, `native`). There are no external test
 frameworks, no mock servers and no network access: the suite is deterministic
 and self-contained.
 
@@ -78,15 +78,12 @@ and a sane byte offset — never a panic and never a partial success.
 
 ## Targets
 
-Every test compiles and runs identically on all three targets:
+Every test compiles and runs identically on all four targets:
 
 ```sh
-moon check --target wasm-gc
-moon check --target js
-moon check --target native
-moon test  --target wasm-gc
-moon test  --target js
-moon test  --target native
+moon check --target all --deny-warn
+moon build --target all
+moon test  --target all --deny-warn
 ```
 
 The targets share the same `.mbt` source and the same assertions; the suite
@@ -95,8 +92,9 @@ contains no backend-specific code.
 ## Verification entry points
 
 - `powershell -ExecutionPolicy Bypass -File scripts\verify_all.ps1` — runs the
-  34-step end-to-end check (format, three targets, per-target CLI smoke,
-  CLI content assertions, examples, budgets, IANA snapshot).
+  43-step end-to-end check (format and interface checks, four targets,
+  per-target CLI smoke, content assertions, examples, budgets, IANA snapshot,
+  package listing).
 - `python scripts/count_code.py` — prints code-line counts per area and
   verifies the line budgets and the 140-test library count.
 - `python scripts/verify_iana_snapshot.py` — verifies the offline IANA snapshot

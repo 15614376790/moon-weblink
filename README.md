@@ -10,8 +10,8 @@ format — over one shared model. It ships an offline snapshot of the IANA Link
 Relation Types registry, a deterministic audit layer, bounded resource limits,
 and structured errors with UTF-8 byte offsets.
 
-- Module: `15614376790/moon-weblink` (version `0.1.0`)
-- Targets: `wasm-gc`, `js`, `native`
+- Module: `15614376790/moon-weblink` (version `0.1.1`)
+- Targets: `wasm`, `wasm-gc`, `js`, `native`
 - License: Apache-2.0
 - Repository: <https://github.com/15614376790/moon-weblink>
 
@@ -44,12 +44,12 @@ and structured errors with UTF-8 byte offsets.
 - **CLI** — `weblink-tool` subcommands to parse, validate, canonicalize,
   query, convert, look up relations and audit.
 - **Safety** — truncation-safe (every byte-prefix of any input never panics)
-  and malformed-input-safe; 147 named tests pass on all three targets.
+  and malformed-input-safe; 147 named tests pass on all four targets.
 
 ## Layout
 
 ```
-moon.mod                 module manifest (15614376790/moon-weblink 0.1.0)
+moon.mod                 module manifest (15614376790/moon-weblink 0.1.1)
 lib source (.mbt)        parser, serializer, model, linkset, audit, query, ...
 cmd/weblink-tool/        command-line tool
 examples/                five runnable example programs
@@ -69,7 +69,7 @@ moon run cmd/weblink-tool -- parse --input '<https://example.com/page/2>; rel="n
 moon run examples/pagination
 ```
 
-Verify everything (formatting, all three targets, CLI, examples, line
+Verify everything (formatting, all four targets, CLI, examples, line
 budgets, IANA snapshot):
 
 ```powershell
@@ -156,7 +156,7 @@ preset; `--json` switches the parse and audit output to machine-readable JSON.
 Reproduced by `scripts/count_code.py` and `scripts/verify_iana_snapshot.py`:
 
 - 147 named tests (140 library blackbox tests + 7 CLI argument-handling
-  tests), all passing on `wasm-gc`, `js` and `native`.
+  tests), all passing on `wasm`, `wasm-gc`, `js` and `native`.
 - 1200 deterministic property-test cases (fixed seeds) + 2504 truncation
   (prefix, parser) cases — every byte-prefix of the complex inputs parses
   without panicking.

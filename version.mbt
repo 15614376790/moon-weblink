@@ -5,5 +5,5 @@
 /// any consumer that prints a version should use this function instead of
 /// hard-coding the string.
 pub fn library_version() -> String {
-  "0.1.0"
+  "0.1.1"
 }
