@@ -6,6 +6,8 @@ is `0.1.1`.
 
 ## [0.1.1] - 2026-08-21
 
+Version `0.1.1` is published to Mooncakes as `15614376790/moon-weblink`.
+
 ### Changed
 
 - Prepared the final-acceptance release without changing core RFC behavior.

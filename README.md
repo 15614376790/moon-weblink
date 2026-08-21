@@ -14,6 +14,7 @@ and structured errors with UTF-8 byte offsets.
 - Targets: `wasm`, `wasm-gc`, `js`, `native`
 - License: Apache-2.0
 - Repository: <https://github.com/15614376790/moon-weblink>
+- Mooncakes: <https://mooncakes.io/package/15614376790/moon-weblink> (`0.1.1`)
 
 ## Features
 

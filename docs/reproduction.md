@@ -178,10 +178,10 @@ under the maintainer's own account (`15614376790`), at
 <https://github.com/15614376790/moon-weblink>; commits are authored with the
 maintainer's real identity, configured by them in their git config.
 
-Version `0.1.0` was published to Mooncakes on 2026-08-13. The final-acceptance
-release is version `0.1.1`, published under the same package name at
-<https://mooncakes.io/package/15614376790/moon-weblink> after the local and
-GitHub Actions gates pass.
+Version `0.1.0` was published to Mooncakes on 2026-08-13. After both the local
+and GitHub Actions gates passed, final-acceptance version `0.1.1` was published
+on 2026-08-21 under the same package name at
+<https://mooncakes.io/package/15614376790/moon-weblink>.
 
 The repository now includes `.github/workflows/ci.yml`, which repeats the
 strict four-target build and test checks on pushes and pull requests. No
